@@ -12,16 +12,6 @@ class Squeeze(nn.Module):
     def forward(self, input: torch.Tensor):
         return input.squeeze()
 
-    
-class CDilated(nn.Module):
-    def __init__(self, nIn, nOut, kSize, stride=1, d=1):
-        super().__init__()
-        padding = int((kSize - 1) / 2) * d  # padding会保持长度不变
-        self.conv = nn.Conv1d(nIn, nOut, kSize, stride=stride, padding=padding, bias=False, dilation=d)
-
-    def forward(self, input):
-        output = self.conv(input)
-        return output
 
 class BasicConv(nn.Module):
     def __init__(self, nIn, nOut, kSize=3, stride=1, dilation=1):
@@ -96,21 +86,21 @@ class DTIDenseNet3to1(nn.Module):
             
         conv_seq = []  
         conv_seq.append(nn.Conv1d(seq_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 序列输入信道64
-        conv_seq.append(self._make_dense(32, seq_oc, 4))  # init 8
+        conv_seq.append(self._make_dense(32, seq_oc, 4))  
         conv_seq.append(nn.AdaptiveMaxPool1d(1))  
         conv_seq.append(Squeeze())
         self.conv_seq = nn.Sequential(*conv_seq)  # (N, 128)
 
         conv_pkt = []
         conv_pkt.append(nn.Conv1d(pkt_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 口袋输入信道64
-        conv_pkt.append(self._make_dense(32, pkt_oc, 3))  # init 4
+        conv_pkt.append(self._make_dense(32, pkt_oc, 3))
         conv_pkt.append(nn.AdaptiveMaxPool1d(1))
         conv_pkt.append(Squeeze())
         self.conv_pkt = nn.Sequential(*conv_pkt)  # (N, 64)
 
         conv_smi = []  
         conv_smi.append(nn.Conv1d(smi_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 化合物输入信道128
-        conv_smi.append(self._make_dense(32, smi_oc, 3))  # init 6        
+        conv_smi.append(self._make_dense(32, smi_oc, 3))            
         conv_smi.append(nn.AdaptiveMaxPool1d(1))
         conv_smi.append(Squeeze())
         self.conv_smi = nn.Sequential(*conv_smi)  # (N, 64)
@@ -354,18 +344,18 @@ class DTIDenseNet2to1(nn.Module):
         if self.tag:
             oc = seq_oc
             conv_seq.append(nn.Conv1d(seq_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 序列输入信道64
-            conv_seq.append(self._make_dense(32, oc, 4))  
+            conv_seq.append(self._make_dense(32, oc, 4))  # init 8
         else:
             oc = pkt_oc
             conv_seq.append(nn.Conv1d(pkt_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 口袋输入信道64
-            conv_seq.append(self._make_dense(32, oc, 3))
+            conv_seq.append(self._make_dense(32, oc, 3))  # init 4
         conv_seq.append(nn.AdaptiveMaxPool1d(1))  
         conv_seq.append(Squeeze())
         self.conv_seq = nn.Sequential(*conv_seq)  # (N, 128)
 
         conv_smi = []  
         conv_smi.append(nn.Conv1d(smi_embed_size, 32, kernel_size=3, stride=1, padding=1, dilation=1))  # 化合物输入信道128
-        conv_smi.append(self._make_dense(32, smi_oc, 3))            
+        conv_smi.append(self._make_dense(32, smi_oc, 3))  # init 6     
         conv_smi.append(nn.AdaptiveMaxPool1d(1))
         conv_smi.append(Squeeze())
         self.conv_smi = nn.Sequential(*conv_smi)  # (N, 64)
@@ -444,6 +434,16 @@ class DTIDenseNet2to1(nn.Module):
         return output
 
 ############################################# reference model ####################################################
+
+class CDilated(nn.Module):
+    def __init__(self, nIn, nOut, kSize, stride=1, d=1):
+        super().__init__()
+        padding = int((kSize - 1) / 2) * d  # padding会保持长度不变
+        self.conv = nn.Conv1d(nIn, nOut, kSize, stride=stride, padding=padding, bias=False, dilation=d)
+
+    def forward(self, input):
+        output = self.conv(input)
+        return output
 
 class DilatedParllelResidualBlockA(nn.Module):
     def __init__(self, nIn, nOut, add=True):
@@ -745,7 +745,8 @@ class DeepDTAF_3to2(nn.Module):
             nn.Dropout(0.5),
             nn.PReLU(),
             nn.Linear(64,1),
-            nn.PReLU())
+            nn.PReLU()
+        )
         
         self.classifier2 = nn.Sequential(
             nn.Linear(pkt_oc+smi_oc, 128),
@@ -755,7 +756,8 @@ class DeepDTAF_3to2(nn.Module):
             nn.Dropout(0.5),
             nn.PReLU(),
             nn.Linear(64,1),
-            nn.PReLU())
+            nn.PReLU()
+        )
         
     def forward(self, seq, pkt, smi):
         # assert seq.shape == (N,L,40)
@@ -795,7 +797,6 @@ class Loss_fc():
             return loss1 + self.lamb*loss2, loss1, loss2
         else:
             return self.fn(output.view(-1), target.view(-1))
-        
     
 def test(model: nn.Module, test_loader, loss_function, device, path=None, save=False):
     model.eval()

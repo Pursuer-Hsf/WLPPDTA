@@ -130,8 +130,6 @@ class DTIDataset(Dataset):
 
         if 'training' in phase:
             self.length = len(self.pdbqt) * self.repeat
-            if self.fix:
-                self.repeat = 1
         else:
             self.repeat = 1
             self.fix = True
@@ -187,6 +185,7 @@ class DTIDataset(Dataset):
                     pkt_array = self._fill(pkt_tensor, pkt_array, pkt_tensor_att, pkt_tensor_gro)  # 保留口袋
                 else:
                     seq_array = self._fill(seq_tensor, seq_array, seq_tensor_att, seq_tensor_gro)  # 保留蛋白
+                    
         
         if self.onehot:
             smi_array = np.zeros((len(smi_tensor), CHAR_SMI_SET_LEN), dtype=np.float32)
