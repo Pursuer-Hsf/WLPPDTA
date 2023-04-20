@@ -5,7 +5,6 @@ The MolBART project aims to pre-train a BART transformer language model [1] on m
 We have now published our results in a pre-print [3] which was accepted in Machine Learning: Science and Technology [4] and will make the models and datasets available here.
 
 ## Installation
----
 The project dependencies can be installed as follows:
 
 conda create --name molbart rdkit -c rdkit
@@ -17,7 +16,6 @@ pysmilesutils must also be downloaded and installed. It can be done directly wit
 
 python -m pip install git+https://github.com/MolecularAI/pysmilesutils.git
 ## Running the Code
----
 The following is an example run through of how to run the Chemformer code on the pre-trained models and datasets available here.
 
 Create a Chemformer conda environment, as above.
@@ -28,7 +26,6 @@ Run the fine_tune.sh script.
 You can of course run other scripts in the repository following a similar approach. The Scripts section below provides more details on what each script does.
 
 ## Codebase
----
 The codebase is broadly split into the following parts:
 
 - Models
@@ -68,7 +65,6 @@ See the ArgumentParser args in each file for more details on each argument.
 To run on multiple GPUs use the --gpus <num> argument for the train or fine tune scripts. This will run the script with Pytorch Lightning's distributed data parallel (DDP) processing. Validation will be disabled when using DDP to ensure the GPUs stay synchronised and stop possible deadlocks from occurring.
 
 ## References
----
 [1] Lewis, Mike, et al. "Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension." arXiv preprint arXiv:1910.13461 (2019).
 
 [2] Weininger, David. "SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules." Journal of chemical information and computer sciences 28.1 (1988): 31-36.
