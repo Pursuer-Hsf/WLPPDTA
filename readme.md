@@ -1,24 +1,24 @@
 # WLPPDTA
 
-The MolBART project aims to pre-train a BART transformer language model [1] on molecular SMILES strings [2] by optimising a de-noising objective. We hypothesised that pre-training will lead to improved generalisation, performance, training speed and validity on downstream fine-tuned tasks. We tested the pre-trained model on downstream tasks such as reaction prediction, retrosynthetic prediction, molecular optimisation and molecular property prediction.
+The identification of drug-target interactions is crucial for expediting drug development and reuse. Existing deep learning models based on sequence features have shown promise in predicting binding affinities between small molecule ligands and proteins. However, the effectiveness of incorporating pocket features, which can enhance prediction performance, remains unclear in scenarios where specific pocket information is not available. This study aims to investigate the contributions of both sequence and pocket features to the affinity prediction task, highlighting the limitations of traditional models that heavily rely on pockets and their applicability in real-world scenarios.
 
-We have now published our results in a pre-print [3] which was accepted in Machine Learning: Science and Technology [4] and will make the models and datasets available here.
+The study reveals the dependence of traditional models on pockets, which poses challenges in practical settings where pock-et information is unavailable. To overcome this limitation, two enhanced learning strategies are proposed. The first strategy optimizes the output module and loss function, while the second strategy employs random input dropout. These strategies effectively balance the significance of global protein sequence features and local pocket sequence features, enabling the prediction of protein target affinity even in the absence of pocket information.
 
 ## Installation
 The project dependencies can be installed as follows:
 
-conda create --name molbart rdkit -c rdkit
-conda activate molbart
-conda install pytorch==1.8.0 torchvision cudatoolkit=11.1 -c pytorch -c nvidia
-conda install gcc_linux-64 gxx_linux-64 mpi4py
-pip install -r requirements.txt
-pysmilesutils must also be downloaded and installed. It can be done directly with pip
+conda create -n WLPPDTA python=3.9
+conda activate WLPPDTA
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
+conda install numba
+conda install pandas
+conda install xlwt
+conda install scikit-learn
 
-python -m pip install git+https://github.com/MolecularAI/pysmilesutils.git
 ## Running the Code
-The following is an example run through of how to run the Chemformer code on the pre-trained models and datasets available here.
+The following is an example run through of how to run the WLPPDTA code on the models and datasets available here.
 
-Create a Chemformer conda environment, as above.
+Create a WLPPDTA conda environment, as above.
 Download the dataset of interest and store it locally (let's say ../data/uspto_50.pickle).
 Download a pre-trained Chemformer model and store it locally (let's say ../models/pre-trained/combined.ckpt).
 Update the fine_tune.sh shell script in the example_scripts directory (or create your own) with the paths to your model and dataset, as well as the values of hyperparameters you wish to pass to the script.
@@ -28,11 +28,11 @@ You can of course run other scripts in the repository following a similar approa
 ## Codebase
 The codebase is broadly split into the following parts:
 
-- Models
-- Data helpers
-- Tokenisation
-- Decoding
-- Scripts
+- model.py
+- dataset.py
+- metrices.py
+- run.sh
+- tran.py
 
 ### Models
 The `models.py` file contains a Pytorch Lightning implementation of the BART language model, as well as Pytorch Lightning implementations of models for downstream tasks.
@@ -63,12 +63,3 @@ Each script can be run using python -m molbart.<scipt_name> <args>.
 See the ArgumentParser args in each file for more details on each argument.
 
 To run on multiple GPUs use the --gpus <num> argument for the train or fine tune scripts. This will run the script with Pytorch Lightning's distributed data parallel (DDP) processing. Validation will be disabled when using DDP to ensure the GPUs stay synchronised and stop possible deadlocks from occurring.
-
-## References
-[1] Lewis, Mike, et al. "Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension." arXiv preprint arXiv:1910.13461 (2019).
-
-[2] Weininger, David. "SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules." Journal of chemical information and computer sciences 28.1 (1988): 31-36.
-
-[3] Irwin, Ross, et al. "Chemformer: A Pre-Trained Transformer for Computational Chemistry." ChemRxiv (2021). doi:10.33774/chemrxiv-2021-v2pnn
-
-[4] Irwin, R., Dimitriadis, S., He, J., Bjerrum, E.J., 2021. Chemformer: A Pre-Trained Transformer for Computational Chemistry. Mach. Learn. Sci. Technol. https://doi.org/10.1088/2632-2153/ac3ffb
