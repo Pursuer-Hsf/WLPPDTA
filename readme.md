@@ -7,6 +7,7 @@ The study reveals the dependence of traditional models on pockets, which poses c
 ## Installation
 The project dependencies can be installed as follows:
 
+```
 conda create -n WLPPDTA python=3.9
 conda activate WLPPDTA
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
@@ -14,6 +15,7 @@ conda install numba
 conda install pandas
 conda install xlwt
 conda install scikit-learn
+```
 
 ## Running the Code
 The following is an example run through of how to run the WLPPDTA code on the models and datasets available here.
